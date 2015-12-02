@@ -18,6 +18,7 @@ It contains:
 *   `.git/HEAD` is whichever branch we've checked out,
     or just a revision if we're in detatched HEAD mode
 *   You can also have `.git/{FETCH,ORIG,MERGE,CHERRY_PICK}_HEAD`.
+*   You can also have notes (see `git notes`), stored in `.git/refs/notes/commits`.
 
 Everything else is the working directory, and if *that* is a mess, that's on you.
 git doesn't try to manage it.
@@ -65,7 +66,7 @@ which says only `HEAD` is logged by default.
 > Why would anyone want to use `git symbolic-ref` to create a symbolic
 > reference, anyway?
 
-???
+??? HMMM
 
 > How is HEAD stored?
 
@@ -84,7 +85,7 @@ Yes. The tree is only created if you `git commit`.
 
 > What would you use hooks for?
 
-???
+??? HMMM
 
 > Is there a way to set up a .git/hooks hook other than hand-munging
 > that directory?
@@ -102,38 +103,53 @@ Yes. The tree is only created if you `git commit`.
 > What is this `origin/master` syntax, what is up with that? When would
 > I want to use it?
 
-???
+OMG. The slash is literally a file path separator. This works because
+the relevant reference is stored in `refs/remotes/origin/master`.
+
+*(facepalm forever)*
 
 > What does `git pull` do, exactly?
 
-???
+??? HMMM
 
-> What does `git gc` do? Why doesn't it obliterate revisions that are
+> What does `git gc` do? Why doesn't it obliterate commits that are
 > not reachable via commit back-pointers from any ref?
 
-???
+Everything that *has been* reachable from a reference during the past 2
+weeks (by default) is retained. This is configurable (see `man
+git-config` under `gc.expire`).
+
+`git gc` apparently does other random and unspecified "housekeeping
+tasks" besides collecting objects that are no longer reachable due to
+rebases, branch deletion, and so on.
+
+(I can't help imagining an actual, fairly naive mark and sweep
+implemented somewhere under `git prune` or `git fsck`. But who knows,
+maybe it is not-so-naive.)
 
 > Is there a command to just list all objects?
 
-???
+??? HMMM
 
 > What does `git remote -v` query to get the list of remotes?
 
-According to strace, it looks like it queries config files, `.git/HEAD`,
-and files under `.git/refs/heads`. This is weird because I would have
-expected it to query `.git/refs/remotes/`. It doesn't.
+According to strace, it queries config files, `.git/HEAD`, and files
+under `.git/refs/heads`. This is weird because I would have expected it
+to query `.git/refs/remotes/`. It doesn't.
 
-It looks like `.git/HEAD` is initialized to `ref: refs/heads/master`
-by `git init` even though there is no `master` branch!
+I'm guessing `.git/config` is the usual source of truth...
 
 ???
 
 > What does it mean to say that a file is "tracked"? (`git add FILE`
 > causes git to remember that FILE is now "tracked".)
 
-???
+According to gitguys.com's glossary,
+it literally just means that the file is in the index.
 
 > What does `git tag -l` query to find all tags?
+
+(presumably `.git/refs/tags`)
 
 ???
 
@@ -146,8 +162,7 @@ by `git init` even though there is no `master` branch!
 
 This stuff only seems to be stored in `.git/config` under
 `[remote "origin"]`, so I don't immediately see a way to do it via
-`git`. May be something that `hub` does for you or accessible via the
-web UI.
+`git`. It may be accessible via some github API.
 
 > What is `git pull --ff`?
 
@@ -185,11 +200,20 @@ A plain `git init` on my machine produces this `.git/config` file:
     	bare = false
     	logallrefupdates = true
 
-All these variables and many more are documented in `man git-config`.
+These and many more are documented in `man git-config`.
 
 > OK, so what are "git logical variables" (`git var`)?
 
 ???
+
+> What happens if I type `git add .git`? Is that bad?
+
+Nothing happens. git silently ignores this, I imagine because
+this happens every time you do `git add .*`.
+
+If you try something more specifically wrong,
+like `git add .git/` or `git add .git/HEAD`,
+you get an error message.
 
 
 ## References and reflogs
@@ -237,6 +261,11 @@ No. This is very much per-repo.
 *   `.git/objects/info` is an empty directory in every git repo I've got.
 
 > `.git/objects/info` always seems to be empty. What's it for?
+
+`git update-server-info` generates something in this directory.
+That command claims to be for the benefit of clients of dumb servers; I
+imagine this means servers that just serve the repository as a tree of
+raw binary files.
 
 ???
 
@@ -303,6 +332,13 @@ It's used during merges (see the section below on "conflicts").
 
 (Note there's a separate section about conflicts below.)
 
+> `git init` initializes `.git/HEAD` to `ref: refs/heads/master`
+> but does not create a `master` branch!
+> What commands fail on a brand new repository because of this silliness?
+> (I'm sure I've seen this at least two or three times.)
+
+???
+
 > What does `git merge BRANCH` do to the branch?
 > Is it removed? Changed to point to the current branch?
 
@@ -321,6 +357,12 @@ want "master" to go away.
 > with remotes, but consider `refs/heads/master`. Is the branch `master`
 > anything else, besides that ref?
 
+Branches are additionally configurable in `.git/config`, so each branch
+can (for example) be associated with a default remote
+`branch.<branchname>.remote`, a setting other refs can't have.
+
+I don't know of anything else.
+
 ???
 
 > Can I `git log` branches I'm not on?
@@ -334,6 +376,8 @@ commands ("SPECIFYING RANGES").
 > Can I `git log --graph` all branches?
 
 Yes, `git log --graph --all`.
+(Note: this shows all commits reachable from any reference found under `.git/refs`,
+not all commits in the object store.)
 
 You can also do `git log --graph master branch1 branch2` to see multiple
 specific branches at once.
@@ -351,8 +395,9 @@ specific branches at once.
 
 Yes.
 
-> If two revisions have more than one latest common ancestor,
-> what do the conflict-markers look like?
+> A dag is not necessarily a lattice. If two revisions being merged have
+> more than one latest common ancestor, what do the conflict-markers
+> look like?
 
 ???
 
@@ -387,6 +432,12 @@ Files that were successfully merged only have one entry, and it's stage 0.
 
 > After an operation like a rebase stops with conflicts,
 > how does `git rebase --continue` (or whatever) know what to do?
+
+???
+
+> After something like a rebase stops with conflicts, if you use `git
+> add FILE` to resolve each conflict, is there anything stopping you
+> from then doing `git commit`? Wouldn't that be bad?
 
 ???
 
@@ -454,6 +505,10 @@ After you fix the conflicts and do `git add hi.txt`, you'll see:
 
 ???
 
+> When merging, can you `git pull`? What happens?
+
+???
+
 > When merging, the output of `git status` says what branch I'm on, but
 > not what branch I'm merging. How can I find out?
 
@@ -461,18 +516,40 @@ I don't know an obvious way yet.
 
 You can see what commits you're merging by doing `git log MERGE_HEAD..HEAD`.
 
+`git rev-parse MERGE_HEAD` gives the hash of the commit you're merging,
+but I don't know how to resolve that to a branch name.
+
 ???
 
 > What is up with `git diff` in this state?
+
+(ha ha it's so awesome)
 
 ???
 
 > Is the effect of git-mv stored specially in the repo? Or does it just
 > change entries in the index?
 
-???
+It just changes entries in the index.
+Copying and removing the file manually has the same effect:
+
+    $ cp hi.txt greeting.txt
+    $ git add greeting.txt
+    $ git rm hi.txt
+    rm 'hi.txt'
+    $ git status
+    On branch master
+    Changes to be committed:
+      (use "git reset HEAD <file>..." to unstage)
+
+        renamed:    hi.txt -> greeting.txt
+
+`git diff --cached` in this situation shows one file being removed and another being added,
+unless you've done `git config diff.renames true`.
 
 > How is an edit-move conflict handled?
+
+(prediction) git doesn't notice the conflict. The edit is clobbered.
 
 ???
 
@@ -480,7 +557,7 @@ You can see what commits you're merging by doing `git log MERGE_HEAD..HEAD`.
 
 There isn't.
 
-(By the way, you *can* do `git config diff.renames copy` to enable
+(You *can* do `git config diff.renames copy` to enable
 `git diff -C` to detect and show that a file was created by copying
 another file. Not really worth it.)
 
@@ -498,6 +575,8 @@ another file. Not really worth it.)
 
 > Delete-delete?
 
+(prediction) this is not considered a conflict.
+
 ???
 
 
@@ -505,7 +584,7 @@ another file. Not really worth it.)
 
 > How can I undo `git commit`?
 
-Solution: `git reset --soft HEAD~`
+Solution: `git reset --soft HEAD^`
 
 > How do I undo `git rm FILE/DIR`?
 
@@ -521,12 +600,3 @@ Those are complicated commands, but maybe it's useful to show:
 1.   Recover the old file: `git checkout HEAD FILE1`
 
 2.   Get rid of the new one:  `git rm -f FILE2`
-
-> What happens if I type `git add .git`? Is that bad?
-
-Nothing happens. git silently ignores this, I imagine because
-this happens every time you do `git add .*`.
-
-If you try something more specifically wrong,
-like `git add .git/` or `git add .git/HEAD`,
-you get an error message.
