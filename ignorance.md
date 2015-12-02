@@ -333,7 +333,18 @@ want "master" to go away.
 
 > Can I `git log` branches I'm not on?
 
+Yes, just `git log branch`. Also `man gitrevisions` has a whole section
+on how to specify a set of commits for `git log` and other similar
+commands ("SPECIFYING RANGES").
+
+(It's like `hg help revsets` except not as capable and fantastically cryptic.)
+
 > Can I `git log --graph` all branches?
+
+Yes, `git log --graph --all`.
+
+You can also do `git log --graph master branch1 branch2` to see multiple
+specific branches at once.
 
 
 ## Conflicts
