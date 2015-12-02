@@ -215,6 +215,12 @@ If you try something more specifically wrong,
 like `git add .git/` or `git add .git/HEAD`,
 you get an error message.
 
+> How do credentials work? What are the guarantees? (For example, will a
+> server detect/prevent author spoofing by someone who is authorized to
+> push to that server?)
+
+???
+
 
 ## References and reflogs
 
@@ -397,9 +403,10 @@ Yes.
 
 > A dag is not necessarily a lattice. If two revisions being merged have
 > more than one latest common ancestor, what do the conflict-markers
-> look like?
+> look like? For that matter, does git have to choose an ancestor arbitrarily
+> in order to even *attempt* the merge? (How else would it work?)
 
-???
+??? HMMM
 
 > After git detects conflicts, how is the resulting state represented in
 > `.git`? What commits are the parent of the index in this state?
