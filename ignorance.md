@@ -199,7 +199,6 @@ All these variables and many more are documented in `man git-config`.
 
 ???
 
-
 > What exactly is the reflog?
 
 It is a log that tells what HEAD (and each reference in `.git/refs`) pointed to in the past.
@@ -308,7 +307,6 @@ Files that were successfully merged only have one entry, and it's stage 0.
     100644 b023018cabc396e7692c70bbf5784a93d3f738ab 0	goodbye.txt
     100644 40491b3ad4f6a554851bdbbe008160ef839a9c3a 0	hello.txt
 
-
 > What's the format of the index?
 
 ???
@@ -336,9 +334,13 @@ want "master" to go away.
 > Is there a parallel between command line syntax for `git rebase` and
 > `git merge`?
 
+???
+
 > What's the difference between refs and branches? Some refs are to do
 > with remotes, but consider `refs/heads/master`. Is the branch `master`
 > anything else, besides that ref?
+
+???
 
 > Can I `git log` branches I'm not on?
 
@@ -384,16 +386,28 @@ specific branches at once.
 > The merge dumps me out in a state where there's an uncommitted merge, right?
 > How is that represented in the .git directory?
 
+???
+
 > Can I commit without addresing the conflicts?
+
+???
 
 > What commands detect this "uncommitted merge" state?
 
+???
+
 > What is up with `git diff` in this state?
+
+???
 
 > Is the effect of git-mv stored specially in the repo? Or does it just
 > change entries in the index?
 
+???
+
 > How is an edit-move conflict handled?
+
+???
 
 > Is there a `git cp`? If so, how is an edit-copy merge conflict handled?
 
