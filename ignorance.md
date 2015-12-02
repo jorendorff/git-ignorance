@@ -21,18 +21,6 @@ It contains:
 Everything else is the working directory, and if *that* is a mess, that's on you.
 git doesn't try to manage it.
 
-> What exactly is the reflog?
-
-It seems to literally be a log of when the commit pointed-to by HEAD changed. 
-
-> How is the reflog stored?
-
-I think it's stored in .git/logs.
-
-> Is the reflog shared when you push/pull/clone?
-
-???
-
 > What intermediate states (like "merge in progress but user needs to
 > resolve some conflicts") can a git repo be in?
 
@@ -175,6 +163,30 @@ A plain `git init` on my machine produces this `.git/config` file:
     	logallrefupdates = true
 
 All these variables and many more are documented in `man git-config`.
+
+
+## References and reflogs
+
+> What exactly is the reflog?
+
+It is a log that tells what HEAD (and each reference in `.git/refs`) pointed to in the past.
+
+Each reference in `.git/refs/**` also has its own reflog (stored in `.git/logs/refs/**`).
+
+It's also possible to configure a repository or maybe an individual
+reference not to have a reflog.
+
+> How is the reflog stored?
+
+Reflogs are stored under `.git/logs`, and each one is just a text file, one line per entry.
+
+`git checkout` adds an entry to `.git/logs/HEAD`;
+`git commit` when you're on a branch adds an entry to `.git/logs/refs/heads/<branch>`;
+and so on.
+
+> Is the reflog shared when you push/pull/clone?
+
+No. This is very much per-repo.
 
 
 ## The object store
