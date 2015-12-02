@@ -17,6 +17,7 @@ It contains:
 *   logs for each ref and for HEAD (`.git/logs/refs` and `.git/logs/HEAD`)
 *   `.git/HEAD` is whichever branch we've checked out,
     or just a revision if we're in detatched HEAD mode
+*   You can also have `.git/{FETCH,ORIG,MERGE,CHERRY_PICK}_HEAD`.
 
 Everything else is the working directory, and if *that* is a mess, that's on you.
 git doesn't try to manage it.
