@@ -349,6 +349,11 @@ specific branches at once.
 > When git detects conflicts, are the conflict-markers it inserts into
 > your files useful? Common ancestor?
 
+Yes.
+
+> If two revisions have more than one latest common ancestor,
+> what do the conflict-markers look like?
+
 ???
 
 > After git detects conflicts, how is the resulting state represented in
@@ -388,6 +393,9 @@ Files that were successfully merged only have one entry, and it's stage 0.
 > Can you git-checkout or git-pull with outstanding changes? What
 > happens to those changes?  If they are just re-applied on top of the
 > new checkout, how are conflicts handled?
+
+You can `git checkout` with outstanding changes, and they are re-applied.
+Don't know about conflicts yet.
 
 ???
 
