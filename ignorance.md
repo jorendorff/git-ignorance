@@ -26,7 +26,7 @@ git doesn't try to manage it.
 
 ???
 
-> How do octomerges work?
+> How do octopus merges work?
 
 ???
 
@@ -35,8 +35,36 @@ git doesn't try to manage it.
 
 Apart from detached HEAD state, yes, that's what it is.
 
-There aren't any other "per-repository variables" quite like this,
-though. HEAD is its own totally special thing.
+In addition the whole history of HEAD is logged, by default
+(this is called the reflog).
+
+> Are there other things like HEAD?
+
+In some states there are other "per-repository variables" like this.
+They seem to be called "symbolic references", and they include
+`FETCH_HEAD`, `ORIG_HEAD`, `MERGE_HEAD`, and `CHERRY_PICK_HEAD`.
+I don't know if those have reflogs or not;
+experiment suggests that `MERGE_HEAD` at least isn't logged.
+
+There's a command, `git symbolic-ref`, which you can use to create a new
+symbolic reference:
+
+    $ git symbolic-ref -m "just for fun" BANANAS refs/heads/master
+    $ cat .git/BANANAS
+    ref: refs/heads/master
+    $ git reflog BANANAS
+    f4a0ce8 BANANAS@{0}: commit (initial): readme
+
+This isn't a true reflog, though; see `man git-config` under `core.logAllRefUpdates`
+which says only `HEAD` is logged by default.
+
+`touch .git/logs/BANANAS` did not cause git to start logging changes to
+`BANANAS`, for me. Anyway, I'm way off in the weeds.
+
+> Why would anyone want to use `git symbolic-ref` to create a symbolic
+> reference, anyway?
+
+???
 
 > How is HEAD stored?
 
@@ -47,12 +75,6 @@ So HEAD points to that, and that points to a revision.
 
 If we're in detached HEAD state, then `.git/HEAD` is just a revision number,
 and each time you commit, git changes the file to the new commit's hash.
-
-> What exactly is a ref? How are they stored? What are the rules
-> regarding how they are updated on push/pull/clone?
-
-???
-
 
 > If you `git add` a file to the index, a "blob" is created in the
 > repository's store, right?
@@ -164,8 +186,18 @@ A plain `git init` on my machine produces this `.git/config` file:
 
 All these variables and many more are documented in `man git-config`.
 
+> OK, so what are "git logical variables" (`git var`)?
+
+???
+
 
 ## References and reflogs
+
+> What exactly is a ref? How are they stored? What are the rules
+> regarding how they are updated on push/pull/clone?
+
+???
+
 
 > What exactly is the reflog?
 
