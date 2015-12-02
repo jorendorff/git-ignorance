@@ -399,17 +399,67 @@ Don't know about conflicts yet.
 
 ???
 
-> Suppose I do git-merge and there are edit-edit conflicts.
-> The merge dumps me out in a state where there's an uncommitted merge, right?
-> How is that represented in the .git directory?
-
-???
-
+> Suppose I do `git merge` and there are edit-edit conflicts.
 > Can I commit without addresing the conflicts?
 
-???
+Nope:
+
+    $ git commit -m 'merge, ignoring conflicts'
+    U	hi.txt
+    error: commit is not possible because you have unmerged files.
+    hint: Fix them up in the work tree, and then use 'git add/rm <file>'
+    hint: as appropriate to mark resolution and make a commit.
+    fatal: Exiting because of an unresolved conflict.
 
 > What commands detect this "uncommitted merge" state?
+
+`git status` does it.
+If there are unresolved conflicts in the index, you get this:
+
+    $ git status
+    On branch master
+    You have unmerged paths.
+      (fix conflicts and run "git commit")
+
+    Unmerged paths:
+      (use "git add <file>..." to mark resolution)
+
+        both modified:   hi.txt
+
+    no changes added to commit (use "git add" and/or "git commit -a")
+
+After you fix the conflicts and do `git add hi.txt`, you'll see:
+
+    $ git status
+    On branch master
+    All conflicts fixed but you are still merging.
+      (use "git commit" to conclude merge)
+
+    Changes to be committed:
+
+        modified:   hi.txt
+
+> When merging, the output of `git status` says what branch I'm "On".
+> I've read that this is usually, but not always, the first parent of
+> the merge. Is that true? Where did I read that? If the two *are*
+> somehow different, what does `git status` say, and if it doesn't
+> specify both, how can I recover the other information?
+
+???
+
+> When merging, `.git/HEAD` points to a branch, and `.git/MERGE_HEAD`
+> points to a specific revision. In this state, is it possible to use
+> `git reset` to change the branch pointer? Does that affect the
+> parents of the merge commit I'm working on?
+
+???
+
+> When merging, the output of `git status` says what branch I'm on, but
+> not what branch I'm merging. How can I find out?
+
+I don't know an obvious way yet.
+
+You can see what commits you're merging by doing `git log MERGE_HEAD..HEAD`.
 
 ???
 
