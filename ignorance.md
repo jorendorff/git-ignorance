@@ -286,26 +286,7 @@ stored in the object store.
 > What is a "stage number"? (`git ls-files --stage` shows this for each
 > file in the index.)
 
-I read about this in `man gitrevisions`:
-
-"During a merge, stage 1 is the common ancestor, stage 2 is the target
-branch's version [...], and stage 3 is the version from the branch which
-is being merged."
-
-So you'll have multiple entries in the index for the same file.
-
-Files that were successfully merged only have one entry, and it's stage 0.
-
-    $ git ls-files --stage
-    100644 b023018cabc396e7692c70bbf5784a93d3f738ab 0	goodbye.txt
-    100644 ce013625030ba8dba906f756967f9e9ca394464a 1	hello.txt
-    100644 a7691826998f893ba7d6ffeff52c6c820a70cfbd 2	hello.txt
-    100644 d0e08a8d7b83fce6094afb1e4eb78ef49e3ed41d 3	hello.txt
-    $ vi hello.txt  # fix conflicts
-    $ git add hello.txt
-    $ git ls-files --stage
-    100644 b023018cabc396e7692c70bbf5784a93d3f738ab 0	goodbye.txt
-    100644 40491b3ad4f6a554851bdbbe008160ef839a9c3a 0	hello.txt
+It's used during merges (see the section below on "conflicts").
 
 > What's the format of the index?
 
@@ -372,7 +353,35 @@ specific branches at once.
 
 > After git detects conflicts, how is the resulting state represented in
 > `.git`? What commits are the parent of the index in this state?
-> How does `git rebase --continue` (or whatever) know what to do?
+
+In this state there is a `.git/HEAD` and a `.git/MERGE_HEAD`.
+These will become the parents of the new commit.
+
+Conflicts are indicated using the stage number.
+I read about this in `man gitrevisions`:
+"During a merge, stage 1 is the common ancestor, stage 2 is the target
+branch's version [...], and stage 3 is the version from the branch which
+is being merged."
+
+So you'll have multiple entries in the index for the same file.
+
+Files that were successfully merged only have one entry, and it's stage 0.
+
+`git add FILE` replaces all entries for FILE with a single stage 0 entry:
+
+    $ git ls-files --stage
+    100644 b023018cabc396e7692c70bbf5784a93d3f738ab 0	goodbye.txt
+    100644 ce013625030ba8dba906f756967f9e9ca394464a 1	hello.txt
+    100644 a7691826998f893ba7d6ffeff52c6c820a70cfbd 2	hello.txt
+    100644 d0e08a8d7b83fce6094afb1e4eb78ef49e3ed41d 3	hello.txt
+    $ vi hello.txt  # fix conflicts
+    $ git add hello.txt
+    $ git ls-files --stage
+    100644 b023018cabc396e7692c70bbf5784a93d3f738ab 0	goodbye.txt
+    100644 40491b3ad4f6a554851bdbbe008160ef839a9c3a 0	hello.txt
+
+> After an operation like a rebase stops with conflicts,
+> how does `git rebase --continue` (or whatever) know what to do?
 
 ???
 
