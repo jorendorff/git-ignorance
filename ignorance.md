@@ -245,6 +245,14 @@ No. This is very much per-repo.
 > that could be equivalently spelled out in an unpacked form, as
 > `.git/objects/xx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` files?
 
+Apart from commands specifically designed to expose the difference
+(like `git count-objects`)
+it looks like this is true.
+
+See `man git-repack`, `man git-pack-objects`.
+
+> Does github automatically pack repositories?
+
 ???
 
 > How can I query the object store?
