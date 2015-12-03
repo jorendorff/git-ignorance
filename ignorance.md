@@ -180,7 +180,7 @@ A plain `git init` on my machine produces this `.git/config` file:
     	bare = false
     	logallrefupdates = true
 
-These and many more are documented in `man git-config`.
+Of course there are like a billion of these things, all optional. See `man git-config`.
 
 > OK, so what are "git logical variables" (`git var`)?
 
