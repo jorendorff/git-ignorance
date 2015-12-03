@@ -100,14 +100,6 @@ Yes. The tree is only created if you `git commit`.
 
 ???
 
-> What is this `origin/master` syntax, what is up with that? When would
-> I want to use it?
-
-OMG. The slash is literally a file path separator. This works because
-the relevant reference is stored in `refs/remotes/origin/master`.
-
-*(facepalm forever)*
-
 > What does `git pull` do, exactly?
 
 ??? HMMM
@@ -228,6 +220,14 @@ you get an error message.
 > regarding how they are updated on push/pull/clone?
 
 ???
+
+> What is this `origin/master` syntax, what is up with that? When would
+> I want to use it?
+
+OMG. The slash is literally a file path separator. This works because
+the relevant reference is stored in `refs/remotes/origin/master`.
+
+*(facepalm forever)*
 
 > What exactly is the reflog?
 
