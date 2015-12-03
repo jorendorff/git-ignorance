@@ -144,10 +144,6 @@ This stuff only seems to be stored in `.git/config` under
 `[remote "origin"]`, so I don't immediately see a way to do it via
 `git`. It may be accessible via some github API.
 
-> What is `git pull --ff`?
-
-???
-
 > What is `.gitreview`?
 
 ???
@@ -215,6 +211,10 @@ you get an error message.
 > What does `git pull` do, exactly?
 
 ??? HMMM
+
+> What is `git pull --ff`?
+
+???
 
 
 ## References and reflogs
