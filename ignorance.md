@@ -92,18 +92,6 @@ Yes. The tree is only created if you `git commit`.
 
 ???
 
-> How does `git pull` differ from `git pull origin master`?
-
-???
-
-> How does `git push` differ from `git push origin master`?
-
-???
-
-> What does `git pull` do, exactly?
-
-??? HMMM
-
 > What does `git gc` do? Why doesn't it obliterate commits that are
 > not reachable via commit back-pointers from any ref?
 
@@ -212,6 +200,21 @@ you get an error message.
 > push to that server?)
 
 ???
+
+
+# Updating (push and fetch)
+
+> How does `git pull` differ from `git pull origin master`?
+
+???
+
+> How does `git push` differ from `git push origin master`?
+
+???
+
+> What does `git pull` do, exactly?
+
+??? HMMM
 
 
 ## References and reflogs
