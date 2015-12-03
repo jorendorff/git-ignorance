@@ -333,6 +333,10 @@ It's used during merges (see the section below on "conflicts").
 
 ???
 
+> Can the index store an empty directory?
+
+???
+
 
 ## Branches and merging
 
