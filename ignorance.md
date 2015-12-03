@@ -221,6 +221,17 @@ you get an error message.
 
 ???
 
+> What is a "remote-tracking branch"?
+
+I think this refers to exactly references of the form
+`.git/refs/remotes/<remotename>/<branchname>`.
+
+I suspect they figure in the algorithms for `git fetch` and `git push`.
+
+> Can you `git checkout` a remote-tracking branch?
+
+???
+
 > What is this `origin/master` syntax, what is up with that? When would
 > I want to use it?
 
