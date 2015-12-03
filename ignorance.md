@@ -208,6 +208,33 @@ you get an error message.
 
 ???
 
+> Suppose we've got two git repositories on a local filesystem.  Can we
+> do `cd r1; git pull ../r2`? Or must the argument be a remote listed in
+> `.git/config`?
+
+`git pull ../r2` works.
+
+However if you try to do the same by pushing instead of pulling (`cd r2;
+git push ../r1`) git will refuse to allow it - unless r1 is bare, or
+specially configured, or you're not pushing r1's current branch.
+(Modifying someone else's HEAD is just too weird to allow, even for
+git.)
+
+> Suppose we've got two git repositories on a local filesystem.  Is
+> `cd r1; git fetch ../r2 <branchname>` effectively the same as
+> `cd r2; git push ../r1 <branchname>`?
+
+I think this is mostly the case. Caveats and possibilities to consider:
+
+*   The `push` fails if `<branchname>` is r1's current branch; see
+    previous answer.
+
+*   I guess it is probably possible for `<branchname>` to be configured
+    in one repo to point to something other than the branch named
+    `<branchname>` in the other repo.
+
+???
+
 > What does `git pull` do, exactly?
 
 ??? HMMM
@@ -230,6 +257,11 @@ I think this refers to exactly references of the form
 `.git/refs/remotes/<remotename>/<branchname>`.
 
 I suspect they figure in the algorithms for `git fetch` and `git push`.
+
+> What is an "upstream" branch? Do all branches have an upstream? Even
+> remote-tracking branches?
+
+???
 
 > Can you `git checkout` a remote-tracking branch?
 
