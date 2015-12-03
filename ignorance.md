@@ -347,6 +347,11 @@ It's used during merges (see the section below on "conflicts").
 > What commands fail on a brand new repository because of this silliness?
 > (I'm sure I've seen this at least two or three times.)
 
+One place where this is special-cased, at least, is `git diff --staged`.
+The manual page has this bizarre sentence: "If HEAD does not exist
+(e.g. unborn branches) and <commit> is not given, it shows all staged
+changes."
+
 ???
 
 > What does `git merge BRANCH` do to the branch?
