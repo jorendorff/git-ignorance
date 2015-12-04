@@ -26,9 +26,13 @@ git doesn't try to manage it.
 > What intermediate states (like "merge in progress but user needs to
 > resolve some conflicts") can a git repo be in?
 
-???
+Graydon wrote: "
 
-> How do octopus merges work?
+*   The repo as a whole can be in running-a-rebase / running-a-merge state
+*   The individual entries in the index can be in conflict state
+
+"I believe the former is indicated by a control directory and the
+latter is a bit set on an index entry."
 
 ???
 
@@ -66,7 +70,7 @@ which says only `HEAD` is logged by default.
 > Why would anyone want to use `git symbolic-ref` to create a symbolic
 > reference, anyway?
 
-??? HMMM
+You wouldn't.
 
 > How is HEAD stored?
 
@@ -85,12 +89,16 @@ Yes. The tree is only created if you `git commit`.
 
 > What would you use hooks for?
 
-??? HMMM
+*   permission checks
+*   changelog format checks
+*   pretty-printing checks
+*   firing off server-side events like continuous integration testing,
+    sending email, or IRC notification
 
 > Is there a way to set up a .git/hooks hook other than hand-munging
 > that directory?
 
-???
+No.
 
 > What does `git gc` do? Why doesn't it obliterate commits that are
 > not reachable via commit back-pointers from any ref?
@@ -109,7 +117,10 @@ maybe it is not-so-naive.)
 
 > Is there a command to just list all objects?
 
-??? HMMM
+I don't think there is.
+
+For my purposes (experimenting in toy repos), it's good enough to do:
+`(cd .git/objects; find ?? -type f | sed 's/\///' )`
 
 > What does `git remote -v` query to get the list of remotes?
 
@@ -117,7 +128,7 @@ According to strace, it queries config files, `.git/HEAD`, and files
 under `.git/refs/heads`. This is weird because I would have expected it
 to query `.git/refs/remotes/`. It doesn't.
 
-I'm guessing `.git/config` is the usual source of truth...
+I'm guessing `.git/config` is the usual source of truth.
 
 ???
 
@@ -146,11 +157,19 @@ This stuff only seems to be stored in `.git/config` under
 
 > What is `.gitreview`?
 
+Graydon: "Part of gerrit, a code review tool in google."
+
 ???
 
 > What happens if you `git add` a symlink?
 
-???
+It gets added to the index as a symlink! If the target of the symlink
+is, say, "otherfile.txt", then `git add` creates a blob object
+containing just the string `otherfile.txt`.
+
+I guess each entry in the index and each entry in any tree has a bit
+that can be used to indicate "this is a symlink; instead of file bytes,
+the blob is the value of a symlink".
 
 > In a bare repository, how does `git` know that the directory is a git
 > repository?  I thought that was determined by looking for `.git`. But
@@ -195,10 +214,18 @@ you get an error message.
 > server detect/prevent author spoofing by someone who is authorized to
 > push to that server?)
 
-???
+Graydon: "There's no auth layer in git at all. Nothing that works
+anyway. There are GPG signatures. You can kinda trust those. Everything
+else can be a pure lie. You can make changes claiming to be santa claus,
+push them under credentials stolen from the grinch, and no audit trail
+of either will ever say a word about either."
 
 
 # Updating (push and fetch)
+
+This is particularly interesting because now that there's `libgit2` and
+so on, the git repository really stops being a concrete data format
+and starts being defined by the communication protocol.
 
 > How does `git pull` differ from `git pull origin master`?
 
@@ -237,11 +264,34 @@ I think this is mostly the case. Caveats and possibilities to consider:
 
 > What does `git pull` do, exactly?
 
-??? HMMM
+The first two paragraphs of `man git-pull` adequately explain.
+
+It's a `fetch` followed by a `merge` or `rebase`.
 
 > What is `git pull --ff`?
 
-???
+The `--ff` is passed through to `git merge` (it's irrelevant to the `git
+fetch` part of pulling). It affects trivial merges.
+
+If the "merge" does not actually involve merging changes on both
+branches (that is, one branch has no commits since the common ancestor)
+then (by default) no merge commit is created; we just "fast-forward" the
+older branch pointer to point to the newer commit.
+
+`--ff` is the default.
+
+Graydon adds: "Some people want PRs to cause merge nodes -- to record
+the integration event -- even when they don't represent a "merge" so
+much as an extension of master with new history. For them, --no-ff
+exists. And because --no-ff exists and can be set as a default, --ff
+exists."
+
+(Commentary: Github always generates a merge commit if you
+"automatically" merge a pull request via the web site. I almost wish it
+didn't, but the fact that a commit came from a PR is a historical fact
+that arguably should be stored in the repo. Given that, a merge commit
+is the obvious place.  Some sort of object, in any case, is probably the
+right place, and that doesn't leave Github a lot of choices.)
 
 
 ## References and reflogs
@@ -263,7 +313,7 @@ I suspect they figure in the algorithms for `git fetch` and `git push`.
 
 ???
 
-> Can you `git checkout` a remote-tracking branch?
+> Can you `git checkout` a remote-tracking branch? Wouldn't that be bad?
 
 ???
 
@@ -333,7 +383,8 @@ See `man git-repack`, `man git-pack-objects`.
 
 > Does github automatically pack repositories?
 
-???
+Graydon: "I think they use libgit2, so whatever it does. it's not the same as the
+command-line git suite. full reimplementation."
 
 > How can I query the object store?
 
@@ -347,6 +398,10 @@ That way if OBJECT is a commit, you get a patch (with colors, even).
 
 If no such object exists, or if you ask for a blob but the object isn't a blob,
 you get an ugly error message.
+
+> OK, what's `git replace` for?
+
+???
 
 
 ## The index
@@ -371,11 +426,13 @@ It's used during merges (see the section below on "conflicts").
 
 > What's the format of the index?
 
-???
+Graydon: https://github.com/git/git/blob/master/Documentation/technical/index-format.txt
 
 > How does `git commit` know the parents of the new commit? Are they
 > stored in the index? (This is really about how intermediate
 > merge-states are represented on disk.)
+
+I think: HEAD is a parent automatically. MERGE_HEAD if it exists.
 
 ???
 
@@ -392,6 +449,11 @@ It's used during merges (see the section below on "conflicts").
 > but does not create a `master` branch!
 > What commands fail on a brand new repository because of this silliness?
 > (I'm sure I've seen this at least two or three times.)
+
+`git log` fails:
+
+    $ git log
+    fatal: bad default revision 'HEAD'
 
 One place where this is special-cased, at least, is `git diff --staged`.
 The manual page has this bizarre sentence: "If HEAD does not exist
@@ -443,13 +505,48 @@ not all commits in the object store.)
 You can also do `git log --graph master branch1 branch2` to see multiple
 specific branches at once.
 
+> Does MERGE_HEAD always momentarily exist during (non-fast-forwarding)
+> merges, for the benefit of the `git commit` that has to happen?
+
+???
+
+> What are diff3-resolve, file-merge, merge4, and merge5?
+
+(I think some of these are not part of git. This question is here
+because of Graydon's answer below.)
+
+???
+
+> How do octopus merges work? Can the stage numbers go past 3 if there
+> are many parents? Different parent-pairs can have different common
+> ancestors, so what does stage 1 mean? Also, can MERGE_HEAD contain
+> multiple entries? Wouldn't that be super weird?
+
+For one thing, `git merge-octopus` is a merge strategy (see
+`man git-merge`, `MERGE STRATEGIES`).
+
+Graydon writes: "It's just tree-merge with multiple inputs [...] But in
+order to keep this case tractable it assumes / enforces that each file
+has an obvious winner. If there's a file level conflict, it leaves it in
+conflicted state in the index and you have to fix it yourself. Doesn't
+try to do merge4 or merge5 at a line level."
+
+By "tree-merge" I think he is just referring to the fact that the
+problem to be solved here is merging git trees (not blobs). There's not
+a merge strategy with that name.
+
+
+
+???
+
+
 
 ## Conflicts
 
 > When git detects conflicts, is there a way to ask it to open a merge
 > tool automatically?
 
-???
+`git mergetool`.
 
 > When git detects conflicts, are the conflict-markers it inserts into
 > your files useful? Common ancestor?
@@ -461,7 +558,21 @@ Yes.
 > look like? For that matter, does git have to choose an ancestor arbitrarily
 > in order to even *attempt* the merge? (How else would it work?)
 
-??? HMMM
+`git merge` supports a few merge strategies that decide things like this.
+
+The default strategy for merging one branch into another is "recursive",
+and it does indeed do something special in this case.
+
+Wikipedia quotes Torvalds as saying: "When there are more than one
+common ancestors that can be used for three-way merge, it creates a
+merged tree of the common ancestors and uses that as the reference tree
+for the three-way merge. This has been reported to result in fewer merge
+conflicts without causing mis-merges by tests done on actual merge
+commits taken from Linux 2.6 kernel development history. Additionally
+this can detect and handle merges involving renames."
+
+(Graydon meta-comments: "There's no general solution, just hacks. Every
+VCS does this differently.")
 
 > After git detects conflicts, how is the resulting state represented in
 > `.git`? What commits are the parent of the index in this state?
@@ -501,14 +612,55 @@ Files that were successfully merged only have one entry, and it's stage 0.
 > add FILE` to resolve each conflict, is there anything stopping you
 > from then doing `git commit`? Wouldn't that be bad?
 
+Graydon: "Nothing stops you and it is not bad. It is actually done
+intentionally all the time using rebase -i. You mark a point in history
+as "e" for edit, stop and make 1 commit into 20 sub-commits for
+history-readability, then continue. This works and is highly
+tool-supported, encouraged. Splitting commits with rebase, "e",
+commit-commit-commit-continue, and squashing others, is something I do
+every day. It's great."
+
+There is a section in `man git-rebase` on `SPLITTING COMMITS`.
+
+This is still open until I can put it in my own words.  I'm on board
+with `rebase -i` (this is like `hg histedit`) but I don't know how the
+"conflicts" state corresponds to the "rebasing" state. In particular, it
+seems like the "rebasing" state won't have a `MERGE_HEAD`.
+
+I also don't know exactly what git wants you to do before
+`--continue`ing when it dumps you out in a "merging" or "rebasing" state
+with conflicts. Are you just supposed to `git add` fixed files? Or are
+you also supposed to `git commit` them?
+
 ???
 
-> Can you git-checkout or git-pull with outstanding changes? What
+> Can you git-checkout or git-pull with working tree changes? What
 > happens to those changes?  If they are just re-applied on top of the
 > new checkout, how are conflicts handled?
 
-You can `git checkout` with outstanding changes, and they are re-applied.
-Don't know about conflicts yet.
+You can `git checkout` with a dirty working tree. Your changes are
+re-applied.  Don't know about conflicts yet.
+
+???
+
+> Can you git-checkout or git-pull with a dirty index? What happens to
+> those changes? How are conflicts handled?
+
+???
+
+> You can `git pull` with uncommitted changes. I don't understand the result.
+>
+>     git init r1
+>     (cd r1; echo hello > hello.txt; git add hello.txt; git commit -m hello)
+>     git clone r1 r2
+>     (cd r1; echo world >> hello.txt; git commit -am world)
+>     (cd r2; echo there >> hello.txt; git pull ../r1)
+>
+> The final command, `git pull ../r1`, aborts because the merge would
+> clobber uncommitted changes in r2. But `origin/master` still points at
+> the first commit.  If in this state I do `git pull` *again*, it *does*
+> update `origin/master` to point to the second commit from r1. What the
+> hell. Is this supposed to make sense?
 
 ???
 
@@ -540,6 +692,9 @@ If there are unresolved conflicts in the index, you get this:
         both modified:   hi.txt
 
     no changes added to commit (use "git add" and/or "git commit -a")
+
+(Or if you're hardcore, you can type `git ls-files --stage` and look
+for entries showing stage numbers other than 0.)
 
 After you fix the conflicts and do `git add hi.txt`, you'll see:
 
@@ -638,6 +793,36 @@ another file. Not really worth it.)
 > Delete-delete?
 
 (prediction) this is not considered a conflict.
+
+???
+
+
+## Stash
+
+> How are changes stashed with `git stash` stored? Are they objects?
+
+???
+
+> What exactly is it I don't like about `git stash`?
+> Is it just me or is it generally acknowledged to be ugly?
+
+???
+
+> One thing that can happen with `git stash` is that you can
+> accidentally stash only the working tree and not the index.
+> How do you undo that?
+
+???
+
+> What do the weird rev-names of the stashed patches mean?
+
+???
+
+> What would be a better way of doing this in git? Just make a topic
+> branch for every scrap of work? In Mercurial I've tried two
+> approaches: Mercurial queues and changeset evolution (~= topic
+> branches). Neither one is all that bad; both seem a little bit nicer
+> than `git stash` because they seem to model how I work better.
 
 ???
 
