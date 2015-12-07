@@ -448,19 +448,29 @@ I think: HEAD is a parent automatically. MERGE_HEAD if it exists.
 > `git init` initializes `.git/HEAD` to `ref: refs/heads/master`
 > but does not create a `master` branch!
 > What commands fail on a brand new repository because of this silliness?
-> (I'm sure I've seen this at least two or three times.)
 
 `git log` fails:
 
     $ git log
     fatal: bad default revision 'HEAD'
 
+Renaming `master` fails:
+
+    $ git branch -m mainline
+    error: refname refs/heads/master not found
+    fatal: Branch rename failed
+
+Creating a new branch fails:
+
+    $ git branch mainline
+    fatal: Not a valid object name: 'master'.
+
 One place where this is special-cased, at least, is `git diff --staged`.
 The manual page has this bizarre sentence: "If HEAD does not exist
 (e.g. unborn branches) and <commit> is not given, it shows all staged
 changes."
 
-???
+("unborn branches" *facepalm*)
 
 > What does `git merge BRANCH` do to the branch?
 > Is it removed? Changed to point to the current branch?
@@ -474,6 +484,16 @@ want "master" to go away.
 > Is there a parallel between command line syntax for `git rebase` and
 > `git merge`?
 
+I'm still not sure how to answer this.
+`merge` and `rebase` are close relatives,
+but the command-line UI for both of them
+seems to be mostly "options for weird cases",
+and the two commands have different weird cases, mostly.
+
+Both have an `--abort` flag,
+both have a `--no-ff` flag,
+and both support the `-s <strategy>` flag.
+
 ???
 
 > What's the difference between refs and branches? Some refs are to do
@@ -482,7 +502,8 @@ want "master" to go away.
 
 Branches are additionally configurable in `.git/config`, so each branch
 can (for example) be associated with a default remote
-`branch.<branchname>.remote`, a setting other refs can't have.
+`branch.<branchname>.remote`, a setting other refs can't have;
+and likewise `branch.<branchname>.upstream`.
 
 I don't know of anything else.
 
