@@ -220,8 +220,28 @@ else can be a pure lie. You can make changes claiming to be santa claus,
 push them under credentials stolen from the grinch, and no audit trail
 of either will ever say a word about either."
 
+> Is a `git` repo larger than the corresponding `hg` repo?
 
-# Updating (push and fetch)
+???
+
+> Is `git blame` faster than `hg annotate`?
+
+???
+
+> Why is `git-daemon` listed in the git man page but not on my machine?
+
+???
+
+> What is the git equivalent of `hg inbound` / `outbound`?
+
+???
+
+> What exactly is a github pull request?
+
+???
+
+
+## Updating (pushing and fetching)
 
 This is particularly interesting because now that there's `libgit2` and
 so on, the git repository really stops being a concrete data format
@@ -292,6 +312,10 @@ didn't, but the fact that a commit came from a PR is a historical fact
 that arguably should be stored in the repo. Given that, a merge commit
 is the obvious place.  Some sort of object, in any case, is probably the
 right place, and that doesn't leave Github a lot of choices.)
+
+> Can I `git fetch` a specific branch/commit/object?
+
+???
 
 
 ## References and reflogs
@@ -861,6 +885,8 @@ Solution: `git checkout FILE/DIR`
 > How do I undo `git mv FILE1 FILE2`?
 
 Solution: `git mv FILE2 FILE1`
+
+...which makes it seem like a trick question.
 
 You could also do it with `git reset` or `git checkout`.
 Those are complicated commands, but maybe it's useful to show:
