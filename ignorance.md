@@ -240,6 +240,11 @@ of either will ever say a word about either."
 
 ???
 
+> What does `git log` show when you've got a shallow clone?
+> That is, how does it prevent the end of known history?
+
+???
+
 
 ## Updating (pushing and fetching)
 
@@ -324,6 +329,15 @@ right place, and that doesn't leave Github a lot of choices.)
 ???
 
 > Can I `git fetch` a specific branch/commit/object?
+
+???
+
+> There's a configuration variable, automatically created by `git clone`:
+>
+>     $ git config remote.origin.fetch
+>     +refs/heads/*:refs/remotes/origin/*
+>
+> What is this thing? What's its syntax?
 
 ???
 
@@ -565,6 +579,32 @@ specific branches at once.
 
 ???
 
+> `git checkout <branch>` has a weird special case where if `<branch>`
+> doesn't exist, but there's a remote-tracking branch `origin/<branch>`,
+> it creates a local branch `<branch>` tracking that.
+>
+> This case arises after you do `git clone`; in the new clone,
+> remote-tracking branches exist for all branches in the source repo, so
+> you get `origin/master`, `origin/topic1`, `origin/test`, etc.; but it
+> doesn't create corresponding local branches, except I guess for
+> `master`? Is that right?
+>
+> How are the remote-tracking branches stored? They're not in
+> `.git/refs/remotes/origin`.
+>
+> And... why? This seems unfortunate.
+
+They are stored in `.git/packed-refs`.
+
+???
+
+> Why does a repository have `.git/refs/remotes/origin/HEAD`?
+> To me, it doesn't make sense to track that, because you shouldn't care.
+> Is it updated on fetch?
+> Does it exist if upstream is a bare repo?
+
+???
+
 > What are diff3-resolve, file-merge, merge4, and merge5?
 
 (I think some of these are not part of git. This question is here
@@ -589,8 +629,6 @@ try to do merge4 or merge5 at a line level."
 By "tree-merge" I think he is just referring to the fact that the
 problem to be solved here is merging git trees (not blobs). There's not
 a merge strategy with that name.
-
-
 
 ???
 
@@ -904,3 +942,7 @@ Those are complicated commands, but maybe it's useful to show:
 1.   Recover the old file: `git checkout HEAD FILE1`
 
 2.   Get rid of the new one:  `git rm -f FILE2`
+
+> How do I rewrite history to remove sensitive information?
+
+???
