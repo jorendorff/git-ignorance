@@ -230,7 +230,7 @@ of either will ever say a word about either."
 
 > Why is `git-daemon` listed in the git man page but not on my machine?
 
-???
+For some reason it's a separate package. `dnf install git-daemon`.
 
 > What is the git equivalent of `hg inbound` / `outbound`?
 
