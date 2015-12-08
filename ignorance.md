@@ -747,6 +747,17 @@ you also supposed to `git commit` them?
 You can `git checkout` with a dirty working tree. Your changes are
 re-applied.  Don't know about conflicts yet.
 
+Hmm. In other cases `git checkout` across branches fails with something like:
+
+    error: Your local changes to the following files would be overwritten by checkout:
+        hello.txt
+    Please, commit your changes or stash them before you can switch branches.
+    Aborting
+
+This happened for me when hello.txt had been renamed in the other branch.
+Maybe it's the fact that the file doesn't exist over there
+that triggers this error.
+
 ???
 
 > Can you git-checkout or git-pull with a dirty index? What happens to
@@ -872,7 +883,19 @@ unless you've done `git config diff.renames true`.
 
 > How is an edit-move conflict handled?
 
-(prediction) git doesn't notice the conflict. The edit is clobbered.
+Git does not treat this as a conflict.
+The edit is applied to the moved file (which is exactly what you'd want).
+
+> How does git figure out edit-move conflicts?
+
+(That is: the answer to the previous question, how does that work?)
+
+Maybe git looks for renamed files in each commit along the chain of
+commits from each merge-parent to the common ancestor. That would
+predict that an all-in-one "move-and-edit" commit would not be seen as a move,
+and the change would not automatically be applied.
+Instead it would be treated as an edit-delete conflict.
+But the changes *are* automatically applied.
 
 ???
 
@@ -884,23 +907,40 @@ There isn't.
 `git diff -C` to detect and show that a file was created by copying
 another file. Not really worth it.)
 
-> How is an edit-delete conflit handled?
+> How is an edit-delete conflict handled?
 
-???
+The conflict is noted:
+
+    $ git merge dev
+    CONFLICT (modify/delete): x deleted in HEAD and modified in dev. Version dev of x left in tree.
+
+Or:
+
+    $ git checkout dev
+    $ git merge master
+    CONFLICT (modify/delete): x deleted in master and modified in HEAD. Version HEAD of x left in tree.
+
+And the index then only contains entries with stage number 1 and 3, or 1 and 2.
 
 > Move-delete?
 
-???
+Similarly:
+
+    $ git merge dev
+    CONFLICT (rename/delete): y deleted in HEAD and renamed in dev. Version dev of y left in tree.
 
 > Move-move?
 
-???
+    CONFLICT (rename/rename): Rename "x"->"z" in branch "HEAD" rename "x"->"y" in "dev"
 
 > Delete-delete?
 
-(prediction) this is not considered a conflict.
+This is not considered a conflict.
 
-???
+> Are there any other possible kinds of conflict?
+
+Yes, add/add and add/rename. These error messages are generated in
+[merge-recursive.c](https://github.com/git/git/blob/master/merge-recursive.c).
 
 
 ## Stash
