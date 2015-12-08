@@ -245,6 +245,19 @@ For some reason it's a separate package. `dnf install git-daemon`.
 
 ???
 
+> What does `git mv` do? How is it that after
+>
+>     $ git mv x y
+>     $ echo changes >> y
+>     $ git add y
+>
+> `git status` is still able to tell me that I renamed `x` to `y`?
+> Where is this fact stored?
+>
+> Is it stored in the commit when I `git commit`? If so, how?
+
+???
+
 
 ## Updating (pushing and fetching)
 
