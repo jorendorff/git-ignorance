@@ -313,6 +313,16 @@ that arguably should be stored in the repo. Given that, a merge commit
 is the obvious place.  Some sort of object, in any case, is probably the
 right place, and that doesn't leave Github a lot of choices.)
 
+> During `git fetch`, how does the server decide what to send? In easy
+> cases, the client might tell the server "here's the remote-tracking
+> branch pointer I have for you: <SHA>" and the server replies "oh,
+> that's old, here's the 80 more recent commits".  Cases involving
+> upstream merges and rewriting are more interesting, because the server
+> doesn't necessarily know what the client has.  (It's not hard to
+> imagine how it could all work, I just wonder how it *does* work.)
+
+???
+
 > Can I `git fetch` a specific branch/commit/object?
 
 ???
