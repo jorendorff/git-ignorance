@@ -1,27 +1,61 @@
+# Git submodules
+
 *   **What is a submodule?**
 
     A git repository embedded in another repository.
 
 *   **Is all this as ad hoc as it looks, or is there a method to the madness?**
 
-    Unknown.
+    Read on.
+
+
+## Basic tasks
 
 *   **When I first clone a repository, how do I tell git to also populate all submodules to the recorded revisions?**
 
-    I think `git submodule update` is all you need.
+    `git submodule update`
 
 *   **When I pull from a repository, how do I tell git to also update all submodules to the recorded revisions, fetching if necessary?**
 
-    Same deal, `git submodule update`.
+    `git submodule update`
+
+*   **Is it dangerous to do that if I have uncommitted changes in the submodule repo / if I have done `git checkout $other_branch` in the submodule repo?**
+
+    (Unknown.)
 
 *   **Does `git status` in an enclosing repository tell me what I've changed in submodules?**
 
-*   **Does `git commit` in either a submodule or the enclosing repository do anything to the other?**
+    Not in detail, but it'll say:
 
-    No.
+        Changes not staged for commit:
+        ...
+                modified:   path/to/my/submodule (modified content)
 
-*   **OK then, how do I update the enclosing repository so that it understands I made changes in the submodule and I want to use them?**
+*   **Does `git commit` in either a submodule or the enclosing
+    repository do anything to the other?**
 
+    No. Committing in a submodule (or pulling new changes into a
+    submodule) will result in the submodule being "ahead" of the
+    enclosing repository's expectations; `git status` in the enclosing
+    repo will then say:
+
+        Changes not staged for commit:
+        ...
+                modified:   path/to/my/submodule (new commits)
+
+*   **OK then, how do I update the enclosing repository so that it
+    understands I made changes in the submodule and I want to use
+    them?**
+
+    ```
+    git add path/to/my/submodule
+    ```
+
+    This stages the change (to the enclosing repo's index).
+    You still have to commit that change, like any other.
+
+
+## How it works
 
 *   **Where is the recorded revision stored in the enclosing repository?**
 
@@ -36,7 +70,8 @@
     repository. That's how submodule entries get included in commits,
     how they're fetched and pushed across repositories, and so on.
 
-*   **But doesn't that contradict the statement that there are only 4 object types in Git?**
+*   **But doesn't that contradict the statement that there are only 4
+    object types in Git?**
 
     No, there's no such thing as a "gitlink object". A "gitlink entry"
     is just a line item in a tree object.
