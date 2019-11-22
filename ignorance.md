@@ -7,10 +7,10 @@ It contains:
 *   "The index", a staging area (`.git/index`)
 *   The object store (`.git/objects`).
     You can use `git cat-file` to examine objects.
-    There are exactly 4 kinds of object in git:
+    There are just a handful of object types in git:
     *   commits
-    *   blobs, representing snapshots of files (?)
-    *   trees, representing snapshots of directory trees
+    *   blobs, representing snapshots of files
+    *   trees, representing snapshots of directories (including, by reference, all contents recursively)
     *   tags, named pointers to commits.
         <http://www.gitguys.com/topics/git-object-tag/>
 *   branch pointers (`.git/refs`)
