@@ -273,6 +273,16 @@ and starts being defined by the communication protocol.
 
 ???
 
+> `git pull` and `git push` both have two optional positional command-line arguments.
+> Do they have precisely symmetric meaning?
+
+???
+
+> How do the two positional arguments to `git pull` relate to `git
+> fetch`, `git merge`, and `git rebase`?
+
+???
+
 > Suppose we've got two git repositories on a local filesystem.  Can we
 > do `cd r1; git pull ../r2`? Or must the argument be a remote listed in
 > `.git/config`?
@@ -995,6 +1005,17 @@ Those are complicated commands, but maybe it's useful to show:
 1.   Recover the old file: `git checkout HEAD FILE1`
 
 2.   Get rid of the new one:  `git rm -f FILE2`
+
+> How do I undo `git add FILE`?
+
+If the file was totally new, previously untracked, then `git rm --cached FILE`.
+
+If prior to `git add` the index and HEAD were identical, `git reset FILE`.
+
+If the file was previously in the index, with some changes staged, there
+is no way to recover the partly-staged changes.
+https://twitter.com/jorendorff/status/1262782679608680448
+
 
 > How do I rewrite history to remove sensitive information?
 
