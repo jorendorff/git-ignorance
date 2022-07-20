@@ -4,6 +4,10 @@
 
     A git repository embedded in another repository.
 
+*   **What is a superproject?**
+
+    The enclosing git repository that contains a submodule.
+
 *   **Is all this as ad hoc as it looks, or is there a method to the madness?**
 
     Read on.
@@ -11,19 +15,24 @@
 
 ## Basic tasks
 
-*   **When I first clone a repository, how do I tell git to also populate all submodules to the recorded revisions?**
+*   **When I first clone a repository that contains submodules (the
+    superproject), how do I tell git to also populate all submodules to the
+    recorded revisions?**
 
     `git submodule update`
 
-*   **When I pull from a repository, how do I tell git to also update all submodules to the recorded revisions, fetching if necessary?**
+*   **When I pull from the superproject, how do I tell git to also update all
+    submodules to the recorded revisions, fetching if necessary?**
 
     `git submodule update`
 
-*   **Is it dangerous to do that if I have uncommitted changes in the submodule repo / if I have done `git checkout $other_branch` in the submodule repo?**
+*   **Is it dangerous to do that if I have uncommitted changes in the submodule
+    repo / if I have done `git checkout $other_branch` in the submodule repo?**
 
     (Unknown.)
 
-*   **Does `git status` in an enclosing repository tell me what I've changed in submodules?**
+*   **Does `git status` in an enclosing repository tell me what I've changed in
+    submodules?**
 
     Not in detail, but it'll say:
 
@@ -51,8 +60,28 @@
     git add path/to/my/submodule
     ```
 
-    This stages the change (to the enclosing repo's index).
+    This stages the change (to the superproject's index).
     You still have to commit that change, like any other.
+
+*   **What if the change happened in a separate remote (e.g. a separate GitHub
+    repo)? How do I get that change into my superproject? That is, I want to
+    change the superproject to point to a newer revision of one of its
+    submodules.**
+
+    ```
+    cd path/to/my/submodule
+    git pull                   (or `git checkout foo` or whatever)
+    cd -
+
+    git add path/to/my/submodule
+    git commit
+    ```
+
+    It's a lot like any other change you want to make in a git repo. You change
+    the thing in your working directory to have the desired state (in this
+    case, updating the submodule's `HEAD` to point to the desired commit) and
+    then you stage and commit it.
+
 
 
 ## How it works
